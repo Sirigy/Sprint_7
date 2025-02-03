@@ -1,21 +1,27 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <!-- Определение версии модели POM -->
     <modelVersion>4.0.0</modelVersion>
+
+    <!-- Уникальный идентификатор проекта -->
     <groupId>com.example</groupId>
     <artifactId>Sprint_7</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <properties>
-        <!-- Указываем версию Java для компиляции проекта -->
+        <!-- Указываем версию Java для компиляции -->
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
-        <!-- Устанавливаем кодировку исходных файлов проекта -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <!-- Определяем версию AspectJ -->
+        <aspectj.version>1.9.7</aspectj.version>
     </properties>
 
     <dependencies>
-        <!-- JUnit 4 - библиотека для написания и запуска unit-тестов -->
+        <!-- Подключаем JUnit 4 для тестирования -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -23,14 +29,14 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- RestAssured - библиотека для тестирования REST API, упрощает отправку HTTP-запросов и проверку ответов -->
+        <!-- Подключаем Rest-Assured для тестирования REST API -->
         <dependency>
             <groupId>io.rest-assured</groupId>
             <artifactId>rest-assured</artifactId>
             <version>5.3.0</version>
         </dependency>
 
-        <!-- Hamcrest - библиотека для создания читаемых утверждений (assertions) в тестах -->
+        <!-- Подключаем Hamcrest для удобного написания проверок -->
         <dependency>
             <groupId>org.hamcrest</groupId>
             <artifactId>hamcrest-core</artifactId>
@@ -38,66 +44,77 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- Allure Java Commons - основная библиотека для интеграции Allure с Java-проектами -->
+        <!-- Подключаем Allure для генерации отчетов -->
         <dependency>
             <groupId>io.qameta.allure</groupId>
             <artifactId>allure-java-commons</artifactId>
             <version>2.21.0</version>
         </dependency>
 
-        <!-- Allure RestAssured - интеграция Allure с RestAssured для сбора данных о запросах и ответах в отчётах -->
+        <!-- Подключаем Allure для Rest-Assured (логирование запросов и ответов) -->
         <dependency>
             <groupId>io.qameta.allure</groupId>
             <artifactId>allure-rest-assured</artifactId>
             <version>2.21.0</version>
         </dependency>
 
-        <!-- Allure JUnit 4 - интеграция Allure с JUnit 4 для создания отчётов о результатах тестов -->
+        <!-- Подключаем Allure для JUnit 4 -->
         <dependency>
             <groupId>io.qameta.allure</groupId>
             <artifactId>allure-junit4</artifactId>
             <version>2.22.0</version>
         </dependency>
 
-        <!-- Jackson - библиотека для работы с JSON (сериализация и десериализация) -->
+        <!-- Подключаем Jackson для работы с JSON -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
             <version>2.15.0</version>
         </dependency>
+
+        <!-- Подключаем AspectJ для поддержки аннотации @Step в Allure -->
+        <dependency>
+            <groupId>org.aspectj</groupId>
+            <artifactId>aspectjweaver</artifactId>
+            <version>${aspectj.version}</version>
+        </dependency>
     </dependencies>
 
     <build>
         <plugins>
-            <!-- Maven Surefire Plugin - плагин для запуска тестов во время сборки проекта -->
+            <!-- Плагин запуска тестов Maven Surefire -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.0.0-M5</version>
                 <configuration>
+                    <!-- Подключаем AspectJ для работы аннотации @Step -->
+                    <argLine>
+                        -javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"
+                    </argLine>
+
+                    <!-- Указываем слушатель для интеграции Allure с JUnit 4 -->
                     <properties>
                         <property>
-                            <!-- Указываем listener для интеграции Allure с JUnit 4 -->
                             <name>listener</name>
                             <value>io.qameta.allure.junit4.AllureJunit4</value>
                         </property>
                     </properties>
+
+                    <!-- Указываем директорию для хранения результатов Allure -->
                     <systemPropertyVariables>
-                        <!-- Указываем директорию для сохранения результатов Allure -->
                         <allure.results.directory>${project.build.directory}/allure-results</allure.results.directory>
                     </systemPropertyVariables>
                 </configuration>
             </plugin>
 
-            <!-- Allure Maven Plugin - плагин для генерации отчётов Allure -->
+            <!-- Плагин для генерации Allure-отчетов -->
             <plugin>
                 <groupId>io.qameta.allure</groupId>
                 <artifactId>allure-maven</artifactId>
                 <version>2.10.0</version>
                 <configuration>
-                    <!-- Указываем директорию для хранения результатов Allure -->
                     <resultsDirectory>${project.build.directory}/allure-results</resultsDirectory>
-                    <!-- Указываем директорию для генерации отчётов Allure -->
                     <reportDirectory>${project.build.directory}/allure-report</reportDirectory>
                 </configuration>
             </plugin>
